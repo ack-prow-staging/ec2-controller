@@ -114,6 +114,9 @@ func (rm *resourceManager) sdkFind(
 		}
 		if elem.Operator != nil {
 			f6 := &svcapitypes.OperatorResponse{}
+			if elem.Operator.HiddenByDefault != nil {
+				f6.HiddenByDefault = elem.Operator.HiddenByDefault
+			}
 			if elem.Operator.Managed != nil {
 				f6.Managed = elem.Operator.Managed
 			}
@@ -173,9 +176,9 @@ func (rm *resourceManager) newListRequestPayload(
 	res := &svcsdk.DescribeLaunchTemplatesInput{}
 
 	if r.ko.Status.ID != nil {
-		f2 := []string{}
-		f2 = append(f2, *r.ko.Status.ID)
-		res.LaunchTemplateIds = f2
+		f3 := []string{}
+		f3 = append(f3, *r.ko.Status.ID)
+		res.LaunchTemplateIds = f3
 	}
 
 	return res, nil
@@ -242,6 +245,9 @@ func (rm *resourceManager) sdkCreate(
 	}
 	if resp.LaunchTemplate.Operator != nil {
 		f6 := &svcapitypes.OperatorResponse{}
+		if resp.LaunchTemplate.Operator.HiddenByDefault != nil {
+			f6.HiddenByDefault = resp.LaunchTemplate.Operator.HiddenByDefault
+		}
 		if resp.LaunchTemplate.Operator.Managed != nil {
 			f6.Managed = resp.LaunchTemplate.Operator.Managed
 		}
@@ -294,6 +300,14 @@ func (rm *resourceManager) newCreateRequestPayload(
 					f0f0elemf1 := &svcsdktypes.LaunchTemplateEbsBlockDeviceRequest{}
 					if f0f0iter.EBS.DeleteOnTermination != nil {
 						f0f0elemf1.DeleteOnTermination = f0f0iter.EBS.DeleteOnTermination
+					}
+					if f0f0iter.EBS.EBSCardIndex != nil {
+						ebsCardIndexCopy0 := *f0f0iter.EBS.EBSCardIndex
+						if ebsCardIndexCopy0 > math.MaxInt32 || ebsCardIndexCopy0 < math.MinInt32 {
+							return nil, fmt.Errorf("error: field EbsCardIndex is of type int32")
+						}
+						ebsCardIndexCopy := int32(ebsCardIndexCopy0)
+						f0f0elemf1.EbsCardIndex = &ebsCardIndexCopy
 					}
 					if f0f0iter.EBS.Encrypted != nil {
 						f0f0elemf1.Encrypted = f0f0iter.EBS.Encrypted
@@ -372,6 +386,9 @@ func (rm *resourceManager) newCreateRequestPayload(
 				}
 				coreCountCopy := int32(coreCountCopy0)
 				f0f2.CoreCount = &coreCountCopy
+			}
+			if r.ko.Spec.Data.CPUOptions.NestedVirtualization != nil {
+				f0f2.NestedVirtualization = svcsdktypes.NestedVirtualizationSpecification(*r.ko.Spec.Data.CPUOptions.NestedVirtualization)
 			}
 			if r.ko.Spec.Data.CPUOptions.ThreadsPerCore != nil {
 				threadsPerCoreCopy0 := *r.ko.Spec.Data.CPUOptions.ThreadsPerCore
@@ -1002,6 +1019,58 @@ func (rm *resourceManager) newCreateRequestPayload(
 		if r.ko.Spec.Data.RAMDiskID != nil {
 			f0.RamDiskId = r.ko.Spec.Data.RAMDiskID
 		}
+		if r.ko.Spec.Data.SecondaryInterfaces != nil {
+			f0f27 := []svcsdktypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+			for _, f0f27iter := range r.ko.Spec.Data.SecondaryInterfaces {
+				f0f27elem := &svcsdktypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+				if f0f27iter.DeleteOnTermination != nil {
+					f0f27elem.DeleteOnTermination = f0f27iter.DeleteOnTermination
+				}
+				if f0f27iter.DeviceIndex != nil {
+					deviceIndexCopy0 := *f0f27iter.DeviceIndex
+					if deviceIndexCopy0 > math.MaxInt32 || deviceIndexCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field DeviceIndex is of type int32")
+					}
+					deviceIndexCopy := int32(deviceIndexCopy0)
+					f0f27elem.DeviceIndex = &deviceIndexCopy
+				}
+				if f0f27iter.InterfaceType != nil {
+					f0f27elem.InterfaceType = svcsdktypes.SecondaryInterfaceType(*f0f27iter.InterfaceType)
+				}
+				if f0f27iter.NetworkCardIndex != nil {
+					networkCardIndexCopy0 := *f0f27iter.NetworkCardIndex
+					if networkCardIndexCopy0 > math.MaxInt32 || networkCardIndexCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field NetworkCardIndex is of type int32")
+					}
+					networkCardIndexCopy := int32(networkCardIndexCopy0)
+					f0f27elem.NetworkCardIndex = &networkCardIndexCopy
+				}
+				if f0f27iter.PrivateIPAddressCount != nil {
+					privateIPAddressCountCopy0 := *f0f27iter.PrivateIPAddressCount
+					if privateIPAddressCountCopy0 > math.MaxInt32 || privateIPAddressCountCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field PrivateIpAddressCount is of type int32")
+					}
+					privateIPAddressCountCopy := int32(privateIPAddressCountCopy0)
+					f0f27elem.PrivateIpAddressCount = &privateIPAddressCountCopy
+				}
+				if f0f27iter.PrivateIPAddresses != nil {
+					f0f27elemf5 := []svcsdktypes.SecondaryInterfacePrivateIpAddressSpecificationRequest{}
+					for _, f0f27elemf5iter := range f0f27iter.PrivateIPAddresses {
+						f0f27elemf5elem := &svcsdktypes.SecondaryInterfacePrivateIpAddressSpecificationRequest{}
+						if f0f27elemf5iter.PrivateIPAddress != nil {
+							f0f27elemf5elem.PrivateIpAddress = f0f27elemf5iter.PrivateIPAddress
+						}
+						f0f27elemf5 = append(f0f27elemf5, *f0f27elemf5elem)
+					}
+					f0f27elem.PrivateIpAddresses = f0f27elemf5
+				}
+				if f0f27iter.SecondarySubnetID != nil {
+					f0f27elem.SecondarySubnetId = f0f27iter.SecondarySubnetID
+				}
+				f0f27 = append(f0f27, *f0f27elem)
+			}
+			f0.SecondaryInterfaces = f0f27
+		}
 		if r.ko.Spec.Data.SecurityGroupIDs != nil {
 			f0.SecurityGroupIds = aws.ToStringSlice(r.ko.Spec.Data.SecurityGroupIDs)
 		}
@@ -1097,6 +1166,10 @@ func (rm *resourceManager) sdkUpdate(
 					if f2f0iter.Ebs.DeleteOnTermination != nil {
 						f2f0elemf1.DeleteOnTermination = f2f0iter.Ebs.DeleteOnTermination
 					}
+					if f2f0iter.Ebs.EbsCardIndex != nil {
+						ebsCardIndexCopy := int64(*f2f0iter.Ebs.EbsCardIndex)
+						f2f0elemf1.EBSCardIndex = &ebsCardIndexCopy
+					}
 					if f2f0iter.Ebs.Encrypted != nil {
 						f2f0elemf1.Encrypted = f2f0iter.Ebs.Encrypted
 					}
@@ -1158,6 +1231,9 @@ func (rm *resourceManager) sdkUpdate(
 			if resp.LaunchTemplateVersion.LaunchTemplateData.CpuOptions.CoreCount != nil {
 				coreCountCopy := int64(*resp.LaunchTemplateVersion.LaunchTemplateData.CpuOptions.CoreCount)
 				f2f2.CoreCount = &coreCountCopy
+			}
+			if resp.LaunchTemplateVersion.LaunchTemplateData.CpuOptions.NestedVirtualization != "" {
+				f2f2.NestedVirtualization = aws.String(string(resp.LaunchTemplateVersion.LaunchTemplateData.CpuOptions.NestedVirtualization))
 			}
 			if resp.LaunchTemplateVersion.LaunchTemplateData.CpuOptions.ThreadsPerCore != nil {
 				threadsPerCoreCopy := int64(*resp.LaunchTemplateVersion.LaunchTemplateData.CpuOptions.ThreadsPerCore)
@@ -1684,6 +1760,46 @@ func (rm *resourceManager) sdkUpdate(
 		if resp.LaunchTemplateVersion.LaunchTemplateData.RamDiskId != nil {
 			f2.RAMDiskID = resp.LaunchTemplateVersion.LaunchTemplateData.RamDiskId
 		}
+		if resp.LaunchTemplateVersion.LaunchTemplateData.SecondaryInterfaces != nil {
+			f2f28 := []*svcapitypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+			for _, f2f28iter := range resp.LaunchTemplateVersion.LaunchTemplateData.SecondaryInterfaces {
+				f2f28elem := &svcapitypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+				if f2f28iter.DeleteOnTermination != nil {
+					f2f28elem.DeleteOnTermination = f2f28iter.DeleteOnTermination
+				}
+				if f2f28iter.DeviceIndex != nil {
+					deviceIndexCopy := int64(*f2f28iter.DeviceIndex)
+					f2f28elem.DeviceIndex = &deviceIndexCopy
+				}
+				if f2f28iter.InterfaceType != "" {
+					f2f28elem.InterfaceType = aws.String(string(f2f28iter.InterfaceType))
+				}
+				if f2f28iter.NetworkCardIndex != nil {
+					networkCardIndexCopy := int64(*f2f28iter.NetworkCardIndex)
+					f2f28elem.NetworkCardIndex = &networkCardIndexCopy
+				}
+				if f2f28iter.PrivateIpAddressCount != nil {
+					privateIPAddressCountCopy := int64(*f2f28iter.PrivateIpAddressCount)
+					f2f28elem.PrivateIPAddressCount = &privateIPAddressCountCopy
+				}
+				if f2f28iter.PrivateIpAddresses != nil {
+					f2f28elemf5 := []*svcapitypes.SecondaryInterfacePrivateIPAddressSpecificationRequest{}
+					for _, f2f28elemf5iter := range f2f28iter.PrivateIpAddresses {
+						f2f28elemf5elem := &svcapitypes.SecondaryInterfacePrivateIPAddressSpecificationRequest{}
+						if f2f28elemf5iter.PrivateIpAddress != nil {
+							f2f28elemf5elem.PrivateIPAddress = f2f28elemf5iter.PrivateIpAddress
+						}
+						f2f28elemf5 = append(f2f28elemf5, f2f28elemf5elem)
+					}
+					f2f28elem.PrivateIPAddresses = f2f28elemf5
+				}
+				if f2f28iter.SecondarySubnetId != nil {
+					f2f28elem.SecondarySubnetID = f2f28iter.SecondarySubnetId
+				}
+				f2f28 = append(f2f28, f2f28elem)
+			}
+			f2.SecondaryInterfaces = f2f28
+		}
 		if resp.LaunchTemplateVersion.LaunchTemplateData.SecurityGroupIds != nil {
 			f2.SecurityGroupIDs = aws.StringSlice(resp.LaunchTemplateVersion.LaunchTemplateData.SecurityGroupIds)
 		}
@@ -1704,6 +1820,9 @@ func (rm *resourceManager) sdkUpdate(
 	}
 	if resp.LaunchTemplateVersion.Operator != nil {
 		f5 := &svcapitypes.OperatorResponse{}
+		if resp.LaunchTemplateVersion.Operator.HiddenByDefault != nil {
+			f5.HiddenByDefault = resp.LaunchTemplateVersion.Operator.HiddenByDefault
+		}
 		if resp.LaunchTemplateVersion.Operator.Managed != nil {
 			f5.Managed = resp.LaunchTemplateVersion.Operator.Managed
 		}
@@ -1751,6 +1870,14 @@ func (rm *resourceManager) newUpdateRequestPayload(
 					f2f0elemf1 := &svcsdktypes.LaunchTemplateEbsBlockDeviceRequest{}
 					if f2f0iter.EBS.DeleteOnTermination != nil {
 						f2f0elemf1.DeleteOnTermination = f2f0iter.EBS.DeleteOnTermination
+					}
+					if f2f0iter.EBS.EBSCardIndex != nil {
+						ebsCardIndexCopy0 := *f2f0iter.EBS.EBSCardIndex
+						if ebsCardIndexCopy0 > math.MaxInt32 || ebsCardIndexCopy0 < math.MinInt32 {
+							return nil, fmt.Errorf("error: field EbsCardIndex is of type int32")
+						}
+						ebsCardIndexCopy := int32(ebsCardIndexCopy0)
+						f2f0elemf1.EbsCardIndex = &ebsCardIndexCopy
 					}
 					if f2f0iter.EBS.Encrypted != nil {
 						f2f0elemf1.Encrypted = f2f0iter.EBS.Encrypted
@@ -1829,6 +1956,9 @@ func (rm *resourceManager) newUpdateRequestPayload(
 				}
 				coreCountCopy := int32(coreCountCopy0)
 				f2f2.CoreCount = &coreCountCopy
+			}
+			if r.ko.Spec.Data.CPUOptions.NestedVirtualization != nil {
+				f2f2.NestedVirtualization = svcsdktypes.NestedVirtualizationSpecification(*r.ko.Spec.Data.CPUOptions.NestedVirtualization)
 			}
 			if r.ko.Spec.Data.CPUOptions.ThreadsPerCore != nil {
 				threadsPerCoreCopy0 := *r.ko.Spec.Data.CPUOptions.ThreadsPerCore
@@ -2459,6 +2589,58 @@ func (rm *resourceManager) newUpdateRequestPayload(
 		if r.ko.Spec.Data.RAMDiskID != nil {
 			f2.RamDiskId = r.ko.Spec.Data.RAMDiskID
 		}
+		if r.ko.Spec.Data.SecondaryInterfaces != nil {
+			f2f27 := []svcsdktypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+			for _, f2f27iter := range r.ko.Spec.Data.SecondaryInterfaces {
+				f2f27elem := &svcsdktypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+				if f2f27iter.DeleteOnTermination != nil {
+					f2f27elem.DeleteOnTermination = f2f27iter.DeleteOnTermination
+				}
+				if f2f27iter.DeviceIndex != nil {
+					deviceIndexCopy0 := *f2f27iter.DeviceIndex
+					if deviceIndexCopy0 > math.MaxInt32 || deviceIndexCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field DeviceIndex is of type int32")
+					}
+					deviceIndexCopy := int32(deviceIndexCopy0)
+					f2f27elem.DeviceIndex = &deviceIndexCopy
+				}
+				if f2f27iter.InterfaceType != nil {
+					f2f27elem.InterfaceType = svcsdktypes.SecondaryInterfaceType(*f2f27iter.InterfaceType)
+				}
+				if f2f27iter.NetworkCardIndex != nil {
+					networkCardIndexCopy0 := *f2f27iter.NetworkCardIndex
+					if networkCardIndexCopy0 > math.MaxInt32 || networkCardIndexCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field NetworkCardIndex is of type int32")
+					}
+					networkCardIndexCopy := int32(networkCardIndexCopy0)
+					f2f27elem.NetworkCardIndex = &networkCardIndexCopy
+				}
+				if f2f27iter.PrivateIPAddressCount != nil {
+					privateIPAddressCountCopy0 := *f2f27iter.PrivateIPAddressCount
+					if privateIPAddressCountCopy0 > math.MaxInt32 || privateIPAddressCountCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field PrivateIpAddressCount is of type int32")
+					}
+					privateIPAddressCountCopy := int32(privateIPAddressCountCopy0)
+					f2f27elem.PrivateIpAddressCount = &privateIPAddressCountCopy
+				}
+				if f2f27iter.PrivateIPAddresses != nil {
+					f2f27elemf5 := []svcsdktypes.SecondaryInterfacePrivateIpAddressSpecificationRequest{}
+					for _, f2f27elemf5iter := range f2f27iter.PrivateIPAddresses {
+						f2f27elemf5elem := &svcsdktypes.SecondaryInterfacePrivateIpAddressSpecificationRequest{}
+						if f2f27elemf5iter.PrivateIPAddress != nil {
+							f2f27elemf5elem.PrivateIpAddress = f2f27elemf5iter.PrivateIPAddress
+						}
+						f2f27elemf5 = append(f2f27elemf5, *f2f27elemf5elem)
+					}
+					f2f27elem.PrivateIpAddresses = f2f27elemf5
+				}
+				if f2f27iter.SecondarySubnetID != nil {
+					f2f27elem.SecondarySubnetId = f2f27iter.SecondarySubnetID
+				}
+				f2f27 = append(f2f27, *f2f27elem)
+			}
+			f2.SecondaryInterfaces = f2f27
+		}
 		if r.ko.Spec.Data.SecurityGroupIDs != nil {
 			f2.SecurityGroupIds = aws.ToStringSlice(r.ko.Spec.Data.SecurityGroupIDs)
 		}
@@ -2640,6 +2822,10 @@ func (rm *resourceManager) setRequestLaunchTemplateData(
 				if resf0iter.Ebs.DeleteOnTermination != nil {
 					resf0elemf1.DeleteOnTermination = resf0iter.Ebs.DeleteOnTermination
 				}
+				if resf0iter.Ebs.EbsCardIndex != nil {
+					ebsCardIndexCopy := int64(*resf0iter.Ebs.EbsCardIndex)
+					resf0elemf1.EBSCardIndex = &ebsCardIndexCopy
+				}
 				if resf0iter.Ebs.Encrypted != nil {
 					resf0elemf1.Encrypted = resf0iter.Ebs.Encrypted
 				}
@@ -2701,6 +2887,9 @@ func (rm *resourceManager) setRequestLaunchTemplateData(
 		if resp.CpuOptions.CoreCount != nil {
 			coreCountCopy := int64(*resp.CpuOptions.CoreCount)
 			resf2.CoreCount = &coreCountCopy
+		}
+		if resp.CpuOptions.NestedVirtualization != "" {
+			resf2.NestedVirtualization = aws.String(string(resp.CpuOptions.NestedVirtualization))
 		}
 		if resp.CpuOptions.ThreadsPerCore != nil {
 			threadsPerCoreCopy := int64(*resp.CpuOptions.ThreadsPerCore)
@@ -3226,6 +3415,46 @@ func (rm *resourceManager) setRequestLaunchTemplateData(
 	}
 	if resp.RamDiskId != nil {
 		res.RAMDiskID = resp.RamDiskId
+	}
+	if resp.SecondaryInterfaces != nil {
+		resf28 := []*svcapitypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+		for _, resf28iter := range resp.SecondaryInterfaces {
+			resf28elem := &svcapitypes.LaunchTemplateInstanceSecondaryInterfaceSpecificationRequest{}
+			if resf28iter.DeleteOnTermination != nil {
+				resf28elem.DeleteOnTermination = resf28iter.DeleteOnTermination
+			}
+			if resf28iter.DeviceIndex != nil {
+				deviceIndexCopy := int64(*resf28iter.DeviceIndex)
+				resf28elem.DeviceIndex = &deviceIndexCopy
+			}
+			if resf28iter.InterfaceType != "" {
+				resf28elem.InterfaceType = aws.String(string(resf28iter.InterfaceType))
+			}
+			if resf28iter.NetworkCardIndex != nil {
+				networkCardIndexCopy := int64(*resf28iter.NetworkCardIndex)
+				resf28elem.NetworkCardIndex = &networkCardIndexCopy
+			}
+			if resf28iter.PrivateIpAddressCount != nil {
+				privateIPAddressCountCopy := int64(*resf28iter.PrivateIpAddressCount)
+				resf28elem.PrivateIPAddressCount = &privateIPAddressCountCopy
+			}
+			if resf28iter.PrivateIpAddresses != nil {
+				resf28elemf5 := []*svcapitypes.SecondaryInterfacePrivateIPAddressSpecificationRequest{}
+				for _, resf28elemf5iter := range resf28iter.PrivateIpAddresses {
+					resf28elemf5elem := &svcapitypes.SecondaryInterfacePrivateIPAddressSpecificationRequest{}
+					if resf28elemf5iter.PrivateIpAddress != nil {
+						resf28elemf5elem.PrivateIPAddress = resf28elemf5iter.PrivateIpAddress
+					}
+					resf28elemf5 = append(resf28elemf5, resf28elemf5elem)
+				}
+				resf28elem.PrivateIPAddresses = resf28elemf5
+			}
+			if resf28iter.SecondarySubnetId != nil {
+				resf28elem.SecondarySubnetID = resf28iter.SecondarySubnetId
+			}
+			resf28 = append(resf28, resf28elem)
+		}
+		res.SecondaryInterfaces = resf28
 	}
 	if resp.SecurityGroupIds != nil {
 		res.SecurityGroupIDs = aws.StringSlice(resp.SecurityGroupIds)

@@ -455,3 +455,17 @@ class EC2Validator:
 
     def assert_egress_only_internet_gateway(self, eigw_id: str, exists=True):
         assert (self.get_egress_only_internet_gateway(eigw_id) is not None) == exists
+
+    def get_application_status_check(self, asc_id: str) -> Union[None, Dict]:
+        try:
+            aws_res = self.ec2_client.describe_application_status_checks(
+                ApplicationStatusCheckIds=[asc_id]
+            )
+            if len(aws_res["ApplicationStatusChecks"]) > 0:
+                return aws_res["ApplicationStatusChecks"][0]
+            return None
+        except self.ec2_client.exceptions.ClientError:
+            return None
+
+    def assert_application_status_check(self, asc_id: str, exists=True):
+        assert (self.get_application_status_check(asc_id) is not None) == exists

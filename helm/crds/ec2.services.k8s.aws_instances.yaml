@@ -64,6 +64,9 @@ spec:
                       properties:
                         deleteOnTermination:
                           type: boolean
+                        ebsCardIndex:
+                          format: int64
+                          type: integer
                         encrypted:
                           type: boolean
                         iops:
@@ -118,6 +121,8 @@ spec:
                   coreCount:
                     format: int64
                     type: integer
+                  nestedVirtualization:
+                    type: string
                   threadsPerCore:
                     format: int64
                     type: integer
@@ -537,6 +542,38 @@ spec:
                   information, see PV-GRUB (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UserProvidedkernels.html)
                   in the Amazon EC2 User Guide.
                 type: string
+              secondaryInterfaces:
+                description: The secondary interfaces to associate with the instance.
+                items:
+                  description: Describes a secondary interface specification for launching
+                    an instance.
+                  properties:
+                    deleteOnTermination:
+                      type: boolean
+                    deviceIndex:
+                      format: int64
+                      type: integer
+                    interfaceType:
+                      type: string
+                    networkCardIndex:
+                      format: int64
+                      type: integer
+                    privateIPAddressCount:
+                      format: int64
+                      type: integer
+                    privateIPAddresses:
+                      items:
+                        description: Describes a private IPv4 address for a secondary
+                          interface request.
+                        properties:
+                          privateIPAddress:
+                            type: string
+                        type: object
+                      type: array
+                    secondarySubnetID:
+                      type: string
+                  type: object
+                type: array
               securityGroupIDs:
                 description: |-
                   The IDs of the security groups.

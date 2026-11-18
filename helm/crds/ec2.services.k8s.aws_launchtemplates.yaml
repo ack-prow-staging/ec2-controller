@@ -61,6 +61,9 @@ spec:
                           properties:
                             deleteOnTermination:
                               type: boolean
+                            ebsCardIndex:
+                              format: int64
+                              type: integer
                             encrypted:
                               type: boolean
                             iops:
@@ -116,6 +119,8 @@ spec:
                       coreCount:
                         format: int64
                         type: integer
+                      nestedVirtualization:
+                        type: string
                       threadsPerCore:
                         format: int64
                         type: integer
@@ -592,6 +597,38 @@ spec:
                     type: object
                   ramDiskID:
                     type: string
+                  secondaryInterfaces:
+                    items:
+                      description: Describes a secondary interface specification for
+                        a launch template request.
+                      properties:
+                        deleteOnTermination:
+                          type: boolean
+                        deviceIndex:
+                          format: int64
+                          type: integer
+                        interfaceType:
+                          type: string
+                        networkCardIndex:
+                          format: int64
+                          type: integer
+                        privateIPAddressCount:
+                          format: int64
+                          type: integer
+                        privateIPAddresses:
+                          items:
+                            description: |-
+                              Describes a private IPv4 address specification for a secondary interface
+                              request.
+                            properties:
+                              privateIPAddress:
+                                type: string
+                            type: object
+                          type: array
+                        secondarySubnetID:
+                          type: string
+                      type: object
+                    type: array
                   securityGroupIDs:
                     items:
                       type: string
@@ -609,10 +646,7 @@ spec:
                 format: int64
                 type: integer
               name:
-                description: |-
-                  A name for the launch template.
-
-                  Regex Pattern: `^[a-zA-Z0-9\(\)\.\-/_]+$`
+                description: A name for the launch template.
                 type: string
               tags:
                 description: |-
@@ -724,6 +758,8 @@ spec:
               operator:
                 description: The entity that manages the launch template.
                 properties:
+                  hiddenByDefault:
+                    type: boolean
                   managed:
                     type: boolean
                   principal:

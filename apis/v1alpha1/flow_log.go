@@ -38,16 +38,16 @@ type FlowLogSpec struct {
 	// The destination for the flow log data. The meaning of this parameter depends
 	// on the destination type.
 	//
-	//   - If the destination type is cloud-watch-logs, specify the ARN of a CloudWatch
-	//     Logs log group. For example: arn:aws:logs:region:account_id:log-group:my_group
-	//     Alternatively, use the LogGroupName parameter.
+	//    * If the destination type is cloud-watch-logs, specify the ARN of a CloudWatch
+	//    Logs log group. For example: arn:aws:logs:region:account_id:log-group:my_group
+	//    Alternatively, use the LogGroupName parameter.
 	//
-	//   - If the destination type is s3, specify the ARN of an S3 bucket. For
-	//     example: arn:aws:s3:::my_bucket/my_subfolder/ The subfolder is optional.
-	//     Note that you can't use AWSLogs as a subfolder name.
+	//    * If the destination type is s3, specify the ARN of an S3 bucket. For
+	//    example: arn:aws:s3:::my_bucket/my_subfolder/ The subfolder is optional.
+	//    Note that you can't use AWSLogs as a subfolder name.
 	//
-	//   - If the destination type is kinesis-data-firehose, specify the ARN of
-	//     a Kinesis Data Firehose delivery stream. For example: arn:aws:firehose:region:account_id:deliverystream:my_stream
+	//    * If the destination type is kinesis-data-firehose, specify the ARN of
+	//    a Kinesis Data Firehose delivery stream. For example: arn:aws:firehose:region:account_id:deliverystream:my_stream
 	LogDestination *string `json:"logDestination,omitempty"`
 	// The type of destination for the flow log data.
 	//
@@ -84,6 +84,9 @@ type FlowLogSpec struct {
 	// The type of resource to monitor.
 	// +kubebuilder:validation:Required
 	ResourceType *string `json:"resourceType"`
+	// The tag configuration associated with the Flow Logs Amazon EC2 Tags feature
+	// fields in your custom log format.
+	TagFieldSpecifications []*TagFieldSpecificationRequest `json:"tagFieldSpecifications,omitempty"`
 	// The tags. The value parameter is required, but if you don't want the tag
 	// to have a value, specify the parameter with no value, and we set the value
 	// to an empty string.

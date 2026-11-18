@@ -113,6 +113,9 @@ type VPCEndpointStatus struct {
 	// The ID of the Amazon Web Services account that owns the endpoint.
 	// +kubebuilder:validation:Optional
 	OwnerID *string `json:"ownerID,omitempty"`
+	// The payer responsibility settings for the endpoint.
+	// +kubebuilder:validation:Optional
+	PayerResponsibilities []*PayerResponsibilityEntry `json:"payerResponsibilities,omitempty"`
 	// Indicates whether the endpoint is being managed by its service.
 	// +kubebuilder:validation:Optional
 	RequesterManaged *bool `json:"requesterManaged,omitempty"`

@@ -164,6 +164,22 @@ func (rm *resourceManager) sdkFind(
 		} else {
 			ko.Status.OwnerID = nil
 		}
+		if elem.PayerResponsibilities != nil {
+			f8 := []*svcapitypes.PayerResponsibilityEntry{}
+			for _, f8iter := range elem.PayerResponsibilities {
+				f8elem := &svcapitypes.PayerResponsibilityEntry{}
+				if f8iter.PayerResponsibilityType != "" {
+					f8elem.PayerResponsibilityType = aws.String(string(f8iter.PayerResponsibilityType))
+				}
+				if f8iter.Scope != "" {
+					f8elem.Scope = aws.String(string(f8iter.Scope))
+				}
+				f8 = append(f8, f8elem)
+			}
+			ko.Status.PayerResponsibilities = f8
+		} else {
+			ko.Status.PayerResponsibilities = nil
+		}
 		if elem.PolicyDocument != nil {
 			ko.Spec.PolicyDocument = elem.PolicyDocument
 		} else {
@@ -210,18 +226,18 @@ func (rm *resourceManager) sdkFind(
 			ko.Spec.SubnetIDs = nil
 		}
 		if elem.Tags != nil {
-			f17 := []*svcapitypes.Tag{}
-			for _, f17iter := range elem.Tags {
-				f17elem := &svcapitypes.Tag{}
-				if f17iter.Key != nil {
-					f17elem.Key = f17iter.Key
+			f18 := []*svcapitypes.Tag{}
+			for _, f18iter := range elem.Tags {
+				f18elem := &svcapitypes.Tag{}
+				if f18iter.Key != nil {
+					f18elem.Key = f18iter.Key
 				}
-				if f17iter.Value != nil {
-					f17elem.Value = f17iter.Value
+				if f18iter.Value != nil {
+					f18elem.Value = f18iter.Value
 				}
-				f17 = append(f17, f17elem)
+				f18 = append(f18, f18elem)
 			}
-			ko.Spec.Tags = f17
+			ko.Spec.Tags = f18
 		} else {
 			ko.Spec.Tags = nil
 		}
@@ -386,6 +402,22 @@ func (rm *resourceManager) sdkCreate(
 	} else {
 		ko.Status.OwnerID = nil
 	}
+	if resp.VpcEndpoint.PayerResponsibilities != nil {
+		f8 := []*svcapitypes.PayerResponsibilityEntry{}
+		for _, f8iter := range resp.VpcEndpoint.PayerResponsibilities {
+			f8elem := &svcapitypes.PayerResponsibilityEntry{}
+			if f8iter.PayerResponsibilityType != "" {
+				f8elem.PayerResponsibilityType = aws.String(string(f8iter.PayerResponsibilityType))
+			}
+			if f8iter.Scope != "" {
+				f8elem.Scope = aws.String(string(f8iter.Scope))
+			}
+			f8 = append(f8, f8elem)
+		}
+		ko.Status.PayerResponsibilities = f8
+	} else {
+		ko.Status.PayerResponsibilities = nil
+	}
 	if resp.VpcEndpoint.PolicyDocument != nil {
 		ko.Spec.PolicyDocument = resp.VpcEndpoint.PolicyDocument
 	} else {
@@ -432,18 +464,18 @@ func (rm *resourceManager) sdkCreate(
 		ko.Spec.SubnetIDs = nil
 	}
 	if resp.VpcEndpoint.Tags != nil {
-		f17 := []*svcapitypes.Tag{}
-		for _, f17iter := range resp.VpcEndpoint.Tags {
-			f17elem := &svcapitypes.Tag{}
-			if f17iter.Key != nil {
-				f17elem.Key = f17iter.Key
+		f18 := []*svcapitypes.Tag{}
+		for _, f18iter := range resp.VpcEndpoint.Tags {
+			f18elem := &svcapitypes.Tag{}
+			if f18iter.Key != nil {
+				f18elem.Key = f18iter.Key
 			}
-			if f17iter.Value != nil {
-				f17elem.Value = f17iter.Value
+			if f18iter.Value != nil {
+				f18elem.Value = f18iter.Value
 			}
-			f17 = append(f17, f17elem)
+			f18 = append(f18, f18elem)
 		}
-		ko.Spec.Tags = f17
+		ko.Spec.Tags = f18
 	} else {
 		ko.Spec.Tags = nil
 	}

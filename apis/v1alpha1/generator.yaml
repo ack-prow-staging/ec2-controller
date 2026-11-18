@@ -8,6 +8,16 @@ ignore:
     - ModifyVpcEndpoint
   field_paths:
     - AllocateAddressInput.DryRun
+    - CreateApplicationStatusCheckInput.ClientToken
+    - CreateApplicationStatusCheckInput.DryRun
+    - CreateApplicationStatusCheckInput.TagSpecifications
+    # DeletionTime is only set on checks in the deletion grace period, which
+    # the controller never reads (IncludeAll is unset on Describe).
+    - ApplicationStatusCheckResponseObject.DeletionTime
+    # Managed by Associate/DisassociateApplicationStatusCheck, which this
+    # resource does not support yet. Kept out of Status so a future Spec
+    # field for associations does not conflict with it.
+    - ApplicationStatusCheckResponseObject.TargetTagAssociations
     - AllocateAddressInput.TagSpecifications
     - CreateCapacityReservationInput.TagSpecifications
     - CreateCapacityReservationInput.DryRun
@@ -167,6 +177,7 @@ ignore:
     - AccountAttribute
     # - CapacityReservation
     - CapacityReservationFleet
+    - CapacityReservationCancellationQuote
     - CapacityManagerDataExport
     - CarrierGateway
     - ClientVpnEndpoint
@@ -225,6 +236,8 @@ ignore:
     - RouteServerEndpoint
     - RouteServerPeer
     #- SecurityGroup
+    - SecondaryNetwork
+    - SecondarySubnet
     - Snapshot
     - SpotDatafeedSubscription
     - StoreImageTask
@@ -239,6 +252,7 @@ ignore:
     - TransitGatewayMulticastDomain
     - TransitGatewayPeeringAttachment
     - TransitGatewayPolicyTable
+    - TransitGatewayPolicyTableEntry
     - TransitGatewayPrefixListReference
     - TransitGatewayRouteTable
     - TransitGatewayRoute
@@ -291,6 +305,8 @@ operations:
       - Update
     output_wrapper_field_path: LaunchTemplateVersion
     resource_name: LaunchTemplate
+  DescribeApplicationStatusChecks:
+    custom_check_required_fields_missing_method: checkForMissingRequiredFields
   DescribeLaunchTemplates:
     custom_check_required_fields_missing_method: checkForMissingRequiredFields
   DescribeManagedPrefixLists:
@@ -360,6 +376,104 @@ operations:
   DescribeTransitGatewayVpcAttachments:
     custom_check_required_fields_missing_method: checkForMissingRequiredFields
 resources:
+  ApplicationStatusCheck:
+    exceptions:
+      # InvalidParameterValue is EC2's broad validation code and is normally
+      # fixed by editing a Spec value (port, timeout, path, status code
+      # matcher). It has not been confirmed whether EC2 also returns it for a
+      # referenced subnet/security group in HealthCheckPaths whose state is
+      # not yet valid; if so, it should be dropped from this list.
+      terminal_codes:
+      - InvalidParameterValue
+    renames:
+      operations:
+        CreateApplicationStatusCheck:
+          output_fields:
+            ApplicationStatusCheckId: ID
+        DescribeApplicationStatusChecks:
+          input_fields:
+            ApplicationStatusCheckIds: ID
+          output_fields:
+            ApplicationStatusCheckId: ID
+        ModifyApplicationStatusCheck:
+          input_fields:
+            ApplicationStatusCheckId: ID
+          output_fields:
+            ApplicationStatusCheckId: ID
+        DeleteApplicationStatusCheck:
+          input_fields:
+            ApplicationStatusCheckId: ID
+    fields:
+      ID:
+        is_primary_key: true
+        is_read_only: true
+        print:
+          name: ID
+      Protocol:
+        print:
+          name: PROTOCOL
+      Port:
+        print:
+          name: PORT
+      Tags:
+        from:
+          operation: CreateTags
+          path: Tags
+        # Tags are synced through CreateTags/DeleteTags, not Modify. Don't let
+        # the ModifyApplicationStatusCheck output setter overwrite Spec.Tags
+        # (it would set nil if the response omits tags, and the next
+        # reconcile would untag the resource).
+        set:
+        - method: Update
+          ignore: "all"
+      # Server-defaulted fields
+      Aggregation:
+        late_initialize: {}
+      Path:
+        late_initialize: {}
+      Interval:
+        late_initialize: {}
+      Timeout:
+        late_initialize: {}
+      FailureThreshold:
+        late_initialize: {}
+      SuccessThreshold:
+        late_initialize: {}
+      StatusCodeMatcher:
+        late_initialize: {}
+      InitializationGracePeriodSeconds:
+        late_initialize: {}
+      HealthCheckPaths.Source.SubnetID:
+        references:
+          resource: Subnet
+          path: Status.SubnetID
+      HealthCheckPaths.Source.SecurityGroupID:
+        references:
+          resource: SecurityGroup
+          path: Status.ID
+      HealthCheckPaths.Destinations.SubnetID:
+        references:
+          resource: Subnet
+          path: Status.SubnetID
+      HealthCheckPaths.Destinations.SecurityGroupID:
+        references:
+          resource: SecurityGroup
+          path: Status.ID
+    hooks:
+      sdk_create_post_build_request:
+        template_path: hooks/application_status_check/sdk_create_post_build_request.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/application_status_check/sdk_update_pre_build_request.go.tpl
+      # The generated output setters rebuild Spec.HealthCheckPaths from the
+      # AWS response, dropping the nested subnetRef/securityGroupRef fields.
+      # These hooks copy the Refs back (index-matched, only when the resolved
+      # IDs are unchanged) so the CR keeps its references.
+      sdk_read_many_post_set_output:
+        template_path: hooks/application_status_check/sdk_read_many_post_set_output.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/application_status_check/sdk_create_post_set_output.go.tpl
+      sdk_update_post_set_output:
+        template_path: hooks/application_status_check/sdk_update_post_set_output.go.tpl
   CapacityReservation:
     fields:
       Tags:

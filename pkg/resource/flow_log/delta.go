@@ -126,6 +126,13 @@ func newResourceDelta(
 			delta.Add("Spec.ResourceType", a.ko.Spec.ResourceType, b.ko.Spec.ResourceType)
 		}
 	}
+	if len(a.ko.Spec.TagFieldSpecifications) != len(b.ko.Spec.TagFieldSpecifications) {
+		delta.Add("Spec.TagFieldSpecifications", a.ko.Spec.TagFieldSpecifications, b.ko.Spec.TagFieldSpecifications)
+	} else if len(a.ko.Spec.TagFieldSpecifications) > 0 {
+		if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.TagFieldSpecifications, b.ko.Spec.TagFieldSpecifications) {
+			delta.Add("Spec.TagFieldSpecifications", a.ko.Spec.TagFieldSpecifications, b.ko.Spec.TagFieldSpecifications)
+		}
+	}
 	desiredACKTags, _ := convertToOrderedACKTags(a.ko.Spec.Tags)
 	latestACKTags, _ := convertToOrderedACKTags(b.ko.Spec.Tags)
 	if !ackcompare.MapStringStringEqual(desiredACKTags, latestACKTags) {

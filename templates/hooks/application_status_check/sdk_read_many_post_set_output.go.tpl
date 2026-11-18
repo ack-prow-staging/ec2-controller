@@ -1,0 +1,1 @@
+	restoreHealthCheckPathRefs(r, &resource{ko})

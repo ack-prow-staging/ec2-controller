@@ -40,6 +40,7 @@ import (
 	svctypes "github.com/aws-controllers-k8s/ec2-controller/apis/v1alpha1"
 	svcresource "github.com/aws-controllers-k8s/ec2-controller/pkg/resource"
 
+	_ "github.com/aws-controllers-k8s/ec2-controller/pkg/resource/application_status_check"
 	_ "github.com/aws-controllers-k8s/ec2-controller/pkg/resource/capacity_reservation"
 	_ "github.com/aws-controllers-k8s/ec2-controller/pkg/resource/dhcp_options"
 	_ "github.com/aws-controllers-k8s/ec2-controller/pkg/resource/egress_only_internet_gateway"

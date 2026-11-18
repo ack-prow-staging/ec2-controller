@@ -116,6 +116,10 @@ func (rm *resourceManager) sdkFind(
 						if f2iter.Ebs.DeleteOnTermination != nil {
 							f2elemf1.DeleteOnTermination = f2iter.Ebs.DeleteOnTermination
 						}
+						if f2iter.Ebs.EbsCardIndex != nil {
+							ebsCardIndexCopy := int64(*f2iter.Ebs.EbsCardIndex)
+							f2elemf1.EBSCardIndex = &ebsCardIndexCopy
+						}
 						f2elem.EBS = f2elemf1
 					}
 					f2 = append(f2, f2elem)
@@ -158,6 +162,9 @@ func (rm *resourceManager) sdkFind(
 				if elem.CpuOptions.CoreCount != nil {
 					coreCountCopy := int64(*elem.CpuOptions.CoreCount)
 					f6.CoreCount = &coreCountCopy
+				}
+				if elem.CpuOptions.NestedVirtualization != "" {
+					f6.NestedVirtualization = aws.String(string(elem.CpuOptions.NestedVirtualization))
 				}
 				if elem.CpuOptions.ThreadsPerCore != nil {
 					threadsPerCoreCopy := int64(*elem.CpuOptions.ThreadsPerCore)
@@ -527,14 +534,41 @@ func (rm *resourceManager) sdkFind(
 			} else {
 				ko.Status.RootDeviceType = nil
 			}
-			if elem.SecurityGroups != nil {
-				f41 := []*string{}
-				for _, f41iter := range elem.SecurityGroups {
-					var f41elem *string
-					f41elem = f41iter.GroupName
+			if elem.SecondaryInterfaces != nil {
+				f41 := []*svcapitypes.InstanceSecondaryInterfaceSpecificationRequest{}
+				for _, f41iter := range elem.SecondaryInterfaces {
+					f41elem := &svcapitypes.InstanceSecondaryInterfaceSpecificationRequest{}
+					if f41iter.InterfaceType != "" {
+						f41elem.InterfaceType = aws.String(string(f41iter.InterfaceType))
+					}
+					if f41iter.PrivateIpAddresses != nil {
+						f41elemf4 := []*svcapitypes.InstanceSecondaryInterfacePrivateIPAddressRequest{}
+						for _, f41elemf4iter := range f41iter.PrivateIpAddresses {
+							f41elemf4elem := &svcapitypes.InstanceSecondaryInterfacePrivateIPAddressRequest{}
+							if f41elemf4iter.PrivateIpAddress != nil {
+								f41elemf4elem.PrivateIPAddress = f41elemf4iter.PrivateIpAddress
+							}
+							f41elemf4 = append(f41elemf4, f41elemf4elem)
+						}
+						f41elem.PrivateIPAddresses = f41elemf4
+					}
+					if f41iter.SecondarySubnetId != nil {
+						f41elem.SecondarySubnetID = f41iter.SecondarySubnetId
+					}
 					f41 = append(f41, f41elem)
 				}
-				ko.Spec.SecurityGroups = f41
+				ko.Spec.SecondaryInterfaces = f41
+			} else {
+				ko.Spec.SecondaryInterfaces = nil
+			}
+			if elem.SecurityGroups != nil {
+				f42 := []*string{}
+				for _, f42iter := range elem.SecurityGroups {
+					var f42elem *string
+					f42elem = f42iter.GroupName
+					f42 = append(f42, f42elem)
+				}
+				ko.Spec.SecurityGroups = f42
 			} else {
 				ko.Spec.SecurityGroups = nil
 			}
@@ -554,27 +588,27 @@ func (rm *resourceManager) sdkFind(
 				ko.Status.SRIOVNetSupport = nil
 			}
 			if elem.State != nil {
-				f45 := &svcapitypes.InstanceState{}
+				f46 := &svcapitypes.InstanceState{}
 				if elem.State.Code != nil {
 					codeCopy := int64(*elem.State.Code)
-					f45.Code = &codeCopy
+					f46.Code = &codeCopy
 				}
 				if elem.State.Name != "" {
-					f45.Name = aws.String(string(elem.State.Name))
+					f46.Name = aws.String(string(elem.State.Name))
 				}
-				ko.Status.State = f45
+				ko.Status.State = f46
 			} else {
 				ko.Status.State = nil
 			}
 			if elem.StateReason != nil {
-				f46 := &svcapitypes.StateReason{}
+				f47 := &svcapitypes.StateReason{}
 				if elem.StateReason.Code != nil {
-					f46.Code = elem.StateReason.Code
+					f47.Code = elem.StateReason.Code
 				}
 				if elem.StateReason.Message != nil {
-					f46.Message = elem.StateReason.Message
+					f47.Message = elem.StateReason.Message
 				}
-				ko.Status.StateReason = f46
+				ko.Status.StateReason = f47
 			} else {
 				ko.Status.StateReason = nil
 			}
@@ -589,18 +623,18 @@ func (rm *resourceManager) sdkFind(
 				ko.Spec.SubnetID = nil
 			}
 			if elem.Tags != nil {
-				f49 := []*svcapitypes.Tag{}
-				for _, f49iter := range elem.Tags {
-					f49elem := &svcapitypes.Tag{}
-					if f49iter.Key != nil {
-						f49elem.Key = f49iter.Key
+				f50 := []*svcapitypes.Tag{}
+				for _, f50iter := range elem.Tags {
+					f50elem := &svcapitypes.Tag{}
+					if f50iter.Key != nil {
+						f50elem.Key = f50iter.Key
 					}
-					if f49iter.Value != nil {
-						f49elem.Value = f49iter.Value
+					if f50iter.Value != nil {
+						f50elem.Value = f50iter.Value
 					}
-					f49 = append(f49, f49elem)
+					f50 = append(f50, f50elem)
 				}
-				ko.Spec.Tags = f49
+				ko.Spec.Tags = f50
 			} else {
 				ko.Spec.Tags = nil
 			}
@@ -679,9 +713,9 @@ func (rm *resourceManager) newListRequestPayload(
 	res := &svcsdk.DescribeInstancesInput{}
 
 	if r.ko.Status.InstanceID != nil {
-		f2 := []string{}
-		f2 = append(f2, *r.ko.Status.InstanceID)
-		res.InstanceIds = f2
+		f3 := []string{}
+		f3 = append(f3, *r.ko.Status.InstanceID)
+		res.InstanceIds = f3
 	}
 
 	return res, nil
@@ -741,6 +775,10 @@ func (rm *resourceManager) sdkCreate(
 					if f2iter.Ebs.DeleteOnTermination != nil {
 						f2elemf1.DeleteOnTermination = f2iter.Ebs.DeleteOnTermination
 					}
+					if f2iter.Ebs.EbsCardIndex != nil {
+						ebsCardIndexCopy := int64(*f2iter.Ebs.EbsCardIndex)
+						f2elemf1.EBSCardIndex = &ebsCardIndexCopy
+					}
 					f2elem.EBS = f2elemf1
 				}
 				f2 = append(f2, f2elem)
@@ -783,6 +821,9 @@ func (rm *resourceManager) sdkCreate(
 			if elem.CpuOptions.CoreCount != nil {
 				coreCountCopy := int64(*elem.CpuOptions.CoreCount)
 				f6.CoreCount = &coreCountCopy
+			}
+			if elem.CpuOptions.NestedVirtualization != "" {
+				f6.NestedVirtualization = aws.String(string(elem.CpuOptions.NestedVirtualization))
 			}
 			if elem.CpuOptions.ThreadsPerCore != nil {
 				threadsPerCoreCopy := int64(*elem.CpuOptions.ThreadsPerCore)
@@ -1152,14 +1193,41 @@ func (rm *resourceManager) sdkCreate(
 		} else {
 			ko.Status.RootDeviceType = nil
 		}
-		if elem.SecurityGroups != nil {
-			f41 := []*string{}
-			for _, f41iter := range elem.SecurityGroups {
-				var f41elem *string
-				f41elem = f41iter.GroupName
+		if elem.SecondaryInterfaces != nil {
+			f41 := []*svcapitypes.InstanceSecondaryInterfaceSpecificationRequest{}
+			for _, f41iter := range elem.SecondaryInterfaces {
+				f41elem := &svcapitypes.InstanceSecondaryInterfaceSpecificationRequest{}
+				if f41iter.InterfaceType != "" {
+					f41elem.InterfaceType = aws.String(string(f41iter.InterfaceType))
+				}
+				if f41iter.PrivateIpAddresses != nil {
+					f41elemf4 := []*svcapitypes.InstanceSecondaryInterfacePrivateIPAddressRequest{}
+					for _, f41elemf4iter := range f41iter.PrivateIpAddresses {
+						f41elemf4elem := &svcapitypes.InstanceSecondaryInterfacePrivateIPAddressRequest{}
+						if f41elemf4iter.PrivateIpAddress != nil {
+							f41elemf4elem.PrivateIPAddress = f41elemf4iter.PrivateIpAddress
+						}
+						f41elemf4 = append(f41elemf4, f41elemf4elem)
+					}
+					f41elem.PrivateIPAddresses = f41elemf4
+				}
+				if f41iter.SecondarySubnetId != nil {
+					f41elem.SecondarySubnetID = f41iter.SecondarySubnetId
+				}
 				f41 = append(f41, f41elem)
 			}
-			ko.Spec.SecurityGroups = f41
+			ko.Spec.SecondaryInterfaces = f41
+		} else {
+			ko.Spec.SecondaryInterfaces = nil
+		}
+		if elem.SecurityGroups != nil {
+			f42 := []*string{}
+			for _, f42iter := range elem.SecurityGroups {
+				var f42elem *string
+				f42elem = f42iter.GroupName
+				f42 = append(f42, f42elem)
+			}
+			ko.Spec.SecurityGroups = f42
 		} else {
 			ko.Spec.SecurityGroups = nil
 		}
@@ -1179,27 +1247,27 @@ func (rm *resourceManager) sdkCreate(
 			ko.Status.SRIOVNetSupport = nil
 		}
 		if elem.State != nil {
-			f45 := &svcapitypes.InstanceState{}
+			f46 := &svcapitypes.InstanceState{}
 			if elem.State.Code != nil {
 				codeCopy := int64(*elem.State.Code)
-				f45.Code = &codeCopy
+				f46.Code = &codeCopy
 			}
 			if elem.State.Name != "" {
-				f45.Name = aws.String(string(elem.State.Name))
+				f46.Name = aws.String(string(elem.State.Name))
 			}
-			ko.Status.State = f45
+			ko.Status.State = f46
 		} else {
 			ko.Status.State = nil
 		}
 		if elem.StateReason != nil {
-			f46 := &svcapitypes.StateReason{}
+			f47 := &svcapitypes.StateReason{}
 			if elem.StateReason.Code != nil {
-				f46.Code = elem.StateReason.Code
+				f47.Code = elem.StateReason.Code
 			}
 			if elem.StateReason.Message != nil {
-				f46.Message = elem.StateReason.Message
+				f47.Message = elem.StateReason.Message
 			}
-			ko.Status.StateReason = f46
+			ko.Status.StateReason = f47
 		} else {
 			ko.Status.StateReason = nil
 		}
@@ -1214,18 +1282,18 @@ func (rm *resourceManager) sdkCreate(
 			ko.Spec.SubnetID = nil
 		}
 		if elem.Tags != nil {
-			f49 := []*svcapitypes.Tag{}
-			for _, f49iter := range elem.Tags {
-				f49elem := &svcapitypes.Tag{}
-				if f49iter.Key != nil {
-					f49elem.Key = f49iter.Key
+			f50 := []*svcapitypes.Tag{}
+			for _, f50iter := range elem.Tags {
+				f50elem := &svcapitypes.Tag{}
+				if f50iter.Key != nil {
+					f50elem.Key = f50iter.Key
 				}
-				if f49iter.Value != nil {
-					f49elem.Value = f49iter.Value
+				if f50iter.Value != nil {
+					f50elem.Value = f50iter.Value
 				}
-				f49 = append(f49, f49elem)
+				f50 = append(f50, f50elem)
 			}
-			ko.Spec.Tags = f49
+			ko.Spec.Tags = f50
 		} else {
 			ko.Spec.Tags = nil
 		}
@@ -1292,6 +1360,14 @@ func (rm *resourceManager) newCreateRequestPayload(
 				f0elemf1 := &svcsdktypes.EbsBlockDevice{}
 				if f0iter.EBS.DeleteOnTermination != nil {
 					f0elemf1.DeleteOnTermination = f0iter.EBS.DeleteOnTermination
+				}
+				if f0iter.EBS.EBSCardIndex != nil {
+					ebsCardIndexCopy0 := *f0iter.EBS.EBSCardIndex
+					if ebsCardIndexCopy0 > math.MaxInt32 || ebsCardIndexCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field EbsCardIndex is of type int32")
+					}
+					ebsCardIndexCopy := int32(ebsCardIndexCopy0)
+					f0elemf1.EbsCardIndex = &ebsCardIndexCopy
 				}
 				if f0iter.EBS.Encrypted != nil {
 					f0elemf1.Encrypted = f0iter.EBS.Encrypted
@@ -1370,6 +1446,9 @@ func (rm *resourceManager) newCreateRequestPayload(
 			}
 			coreCountCopy := int32(coreCountCopy0)
 			f2.CoreCount = &coreCountCopy
+		}
+		if r.ko.Spec.CPUOptions.NestedVirtualization != nil {
+			f2.NestedVirtualization = svcsdktypes.NestedVirtualizationSpecification(*r.ko.Spec.CPUOptions.NestedVirtualization)
 		}
 		if r.ko.Spec.CPUOptions.ThreadsPerCore != nil {
 			threadsPerCoreCopy0 := *r.ko.Spec.CPUOptions.ThreadsPerCore
@@ -1758,6 +1837,58 @@ func (rm *resourceManager) newCreateRequestPayload(
 	}
 	if r.ko.Spec.RAMDiskID != nil {
 		res.RamdiskId = r.ko.Spec.RAMDiskID
+	}
+	if r.ko.Spec.SecondaryInterfaces != nil {
+		f32 := []svcsdktypes.InstanceSecondaryInterfaceSpecificationRequest{}
+		for _, f32iter := range r.ko.Spec.SecondaryInterfaces {
+			f32elem := &svcsdktypes.InstanceSecondaryInterfaceSpecificationRequest{}
+			if f32iter.DeleteOnTermination != nil {
+				f32elem.DeleteOnTermination = f32iter.DeleteOnTermination
+			}
+			if f32iter.DeviceIndex != nil {
+				deviceIndexCopy0 := *f32iter.DeviceIndex
+				if deviceIndexCopy0 > math.MaxInt32 || deviceIndexCopy0 < math.MinInt32 {
+					return nil, fmt.Errorf("error: field DeviceIndex is of type int32")
+				}
+				deviceIndexCopy := int32(deviceIndexCopy0)
+				f32elem.DeviceIndex = &deviceIndexCopy
+			}
+			if f32iter.InterfaceType != nil {
+				f32elem.InterfaceType = svcsdktypes.SecondaryInterfaceType(*f32iter.InterfaceType)
+			}
+			if f32iter.NetworkCardIndex != nil {
+				networkCardIndexCopy0 := *f32iter.NetworkCardIndex
+				if networkCardIndexCopy0 > math.MaxInt32 || networkCardIndexCopy0 < math.MinInt32 {
+					return nil, fmt.Errorf("error: field NetworkCardIndex is of type int32")
+				}
+				networkCardIndexCopy := int32(networkCardIndexCopy0)
+				f32elem.NetworkCardIndex = &networkCardIndexCopy
+			}
+			if f32iter.PrivateIPAddressCount != nil {
+				privateIPAddressCountCopy0 := *f32iter.PrivateIPAddressCount
+				if privateIPAddressCountCopy0 > math.MaxInt32 || privateIPAddressCountCopy0 < math.MinInt32 {
+					return nil, fmt.Errorf("error: field PrivateIpAddressCount is of type int32")
+				}
+				privateIPAddressCountCopy := int32(privateIPAddressCountCopy0)
+				f32elem.PrivateIpAddressCount = &privateIPAddressCountCopy
+			}
+			if f32iter.PrivateIPAddresses != nil {
+				f32elemf5 := []svcsdktypes.InstanceSecondaryInterfacePrivateIpAddressRequest{}
+				for _, f32elemf5iter := range f32iter.PrivateIPAddresses {
+					f32elemf5elem := &svcsdktypes.InstanceSecondaryInterfacePrivateIpAddressRequest{}
+					if f32elemf5iter.PrivateIPAddress != nil {
+						f32elemf5elem.PrivateIpAddress = f32elemf5iter.PrivateIPAddress
+					}
+					f32elemf5 = append(f32elemf5, *f32elemf5elem)
+				}
+				f32elem.PrivateIpAddresses = f32elemf5
+			}
+			if f32iter.SecondarySubnetID != nil {
+				f32elem.SecondarySubnetId = f32iter.SecondarySubnetID
+			}
+			f32 = append(f32, *f32elem)
+		}
+		res.SecondaryInterfaces = f32
 	}
 	if r.ko.Spec.SecurityGroupIDs != nil {
 		res.SecurityGroupIds = aws.ToStringSlice(r.ko.Spec.SecurityGroupIDs)

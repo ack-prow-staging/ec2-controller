@@ -287,6 +287,17 @@ spec:
                   description: Information about instance capacity usage for a Capacity
                     Reservation.
                   properties:
+                    allocationMetadata:
+                      items:
+                        description: A key-value pair that provides additional metadata
+                          about a capacity allocation.
+                        properties:
+                          key:
+                            type: string
+                          value:
+                            type: string
+                        type: object
+                      type: array
                     allocationType:
                       type: string
                     count:
@@ -403,6 +414,11 @@ spec:
                      support the future-dated Capacity Reservation request due to capacity
                      constraints. You can view unsupported requests for 30 days. The Capacity
                      Reservation will not be delivered.
+
+                     * cancelling - (Future-dated Capacity Reservations) The Capacity Reservation
+                     is being cancelled. Capacity has been released but charges continue for
+                     the commitment wind-down period. The reservation transitions to cancelled
+                     when the wind-down completes.
                 type: string
               totalInstanceCount:
                 description: |-

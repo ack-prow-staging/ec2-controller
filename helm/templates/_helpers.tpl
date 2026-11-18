@@ -72,6 +72,7 @@ rules:
 - apiGroups:
   - ec2.services.k8s.aws
   resources:
+  - applicationstatuschecks
   - capacityreservations
   - dhcpoptions
   - egressonlyinternetgateways
@@ -103,6 +104,7 @@ rules:
 - apiGroups:
   - ec2.services.k8s.aws
   resources:
+  - applicationstatuschecks/status
   - capacityreservations/status
   - dhcpoptions/status
   - egressonlyinternetgateways/status

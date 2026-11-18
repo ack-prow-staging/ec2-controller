@@ -142,19 +142,35 @@ func (rm *resourceManager) sdkFind(
 		} else {
 			ko.Spec.MaxAggregationInterval = nil
 		}
-		if elem.Tags != nil {
-			f14 := []*svcapitypes.Tag{}
-			for _, f14iter := range elem.Tags {
-				f14elem := &svcapitypes.Tag{}
-				if f14iter.Key != nil {
-					f14elem.Key = f14iter.Key
+		if elem.TagFieldSpecifications != nil {
+			f14 := []*svcapitypes.TagFieldSpecificationRequest{}
+			for _, f14iter := range elem.TagFieldSpecifications {
+				f14elem := &svcapitypes.TagFieldSpecificationRequest{}
+				if f14iter.ResourceType != "" {
+					f14elem.ResourceType = aws.String(string(f14iter.ResourceType))
 				}
-				if f14iter.Value != nil {
-					f14elem.Value = f14iter.Value
+				if f14iter.TagKeys != nil {
+					f14elem.TagKeys = aws.StringSlice(f14iter.TagKeys)
 				}
 				f14 = append(f14, f14elem)
 			}
-			ko.Spec.Tags = f14
+			ko.Spec.TagFieldSpecifications = f14
+		} else {
+			ko.Spec.TagFieldSpecifications = nil
+		}
+		if elem.Tags != nil {
+			f15 := []*svcapitypes.Tag{}
+			for _, f15iter := range elem.Tags {
+				f15elem := &svcapitypes.Tag{}
+				if f15iter.Key != nil {
+					f15elem.Key = f15iter.Key
+				}
+				if f15iter.Value != nil {
+					f15elem.Value = f15iter.Value
+				}
+				f15 = append(f15, f15elem)
+			}
+			ko.Spec.Tags = f15
 		} else {
 			ko.Spec.Tags = nil
 		}
@@ -305,6 +321,20 @@ func (rm *resourceManager) newCreateRequestPayload(
 	}
 	if r.ko.Spec.ResourceType != nil {
 		res.ResourceType = svcsdktypes.FlowLogsResourceType(*r.ko.Spec.ResourceType)
+	}
+	if r.ko.Spec.TagFieldSpecifications != nil {
+		f8 := []svcsdktypes.TagFieldSpecificationRequest{}
+		for _, f8iter := range r.ko.Spec.TagFieldSpecifications {
+			f8elem := &svcsdktypes.TagFieldSpecificationRequest{}
+			if f8iter.ResourceType != nil {
+				f8elem.ResourceType = svcsdktypes.TaggableResourceType(*f8iter.ResourceType)
+			}
+			if f8iter.TagKeys != nil {
+				f8elem.TagKeys = aws.ToStringSlice(f8iter.TagKeys)
+			}
+			f8 = append(f8, *f8elem)
+		}
+		res.TagFieldSpecifications = f8
 	}
 	if r.ko.Spec.TrafficType != nil {
 		res.TrafficType = svcsdktypes.TrafficType(*r.ko.Spec.TrafficType)

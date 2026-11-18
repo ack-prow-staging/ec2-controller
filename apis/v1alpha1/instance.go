@@ -192,6 +192,8 @@ type InstanceSpec struct {
 	// information, see PV-GRUB (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/UserProvidedkernels.html)
 	// in the Amazon EC2 User Guide.
 	RAMDiskID *string `json:"ramDiskID,omitempty"`
+	// The secondary interfaces to associate with the instance.
+	SecondaryInterfaces []*InstanceSecondaryInterfaceSpecificationRequest `json:"secondaryInterfaces,omitempty"`
 	// The IDs of the security groups.
 	//
 	// If you specify a network interface, you must specify any security groups

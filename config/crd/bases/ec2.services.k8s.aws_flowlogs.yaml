@@ -138,6 +138,23 @@ spec:
               resourceType:
                 description: The type of resource to monitor.
                 type: string
+              tagFieldSpecifications:
+                description: |-
+                  The tag configuration associated with the Flow Logs Amazon EC2 Tags feature
+                  fields in your custom log format.
+                items:
+                  description: |-
+                    A single resource's tag configuration associated with the Flow Logs Amazon
+                    EC2 Tags feature fields in your custom log format.
+                  properties:
+                    resourceType:
+                      type: string
+                    tagKeys:
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                type: array
               tags:
                 description: |-
                   The tags. The value parameter is required, but if you don't want the tag

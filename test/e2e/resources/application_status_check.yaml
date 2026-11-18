@@ -1,0 +1,11 @@
+apiVersion: ec2.services.k8s.aws/v1alpha1
+kind: ApplicationStatusCheck
+metadata:
+  name: $ASC_NAME
+spec:
+  protocol: $PROTOCOL
+  port: $PORT
+  path: $HEALTH_CHECK_PATH
+  tags:
+    - key: $TAG_KEY
+      value: $TAG_VALUE

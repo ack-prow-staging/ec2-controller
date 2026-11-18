@@ -112,6 +112,20 @@ func (rm *resourceManager) sdkFind(
 			f3 := []*svcapitypes.CapacityAllocation{}
 			for _, f3iter := range elem.CapacityAllocations {
 				f3elem := &svcapitypes.CapacityAllocation{}
+				if f3iter.AllocationMetadata != nil {
+					f3elemf0 := []*svcapitypes.CapacityAllocationMetadataEntry{}
+					for _, f3elemf0iter := range f3iter.AllocationMetadata {
+						f3elemf0elem := &svcapitypes.CapacityAllocationMetadataEntry{}
+						if f3elemf0iter.Key != nil {
+							f3elemf0elem.Key = f3elemf0iter.Key
+						}
+						if f3elemf0iter.Value != nil {
+							f3elemf0elem.Value = f3elemf0iter.Value
+						}
+						f3elemf0 = append(f3elemf0, f3elemf0elem)
+					}
+					f3elem.AllocationMetadata = f3elemf0
+				}
 				if f3iter.AllocationType != "" {
 					f3elem.AllocationType = aws.String(string(f3iter.AllocationType))
 				}
@@ -356,6 +370,20 @@ func (rm *resourceManager) sdkCreate(
 		f3 := []*svcapitypes.CapacityAllocation{}
 		for _, f3iter := range resp.CapacityReservation.CapacityAllocations {
 			f3elem := &svcapitypes.CapacityAllocation{}
+			if f3iter.AllocationMetadata != nil {
+				f3elemf0 := []*svcapitypes.CapacityAllocationMetadataEntry{}
+				for _, f3elemf0iter := range f3iter.AllocationMetadata {
+					f3elemf0elem := &svcapitypes.CapacityAllocationMetadataEntry{}
+					if f3elemf0iter.Key != nil {
+						f3elemf0elem.Key = f3elemf0iter.Key
+					}
+					if f3elemf0iter.Value != nil {
+						f3elemf0elem.Value = f3elemf0iter.Value
+					}
+					f3elemf0 = append(f3elemf0, f3elemf0elem)
+				}
+				f3elem.AllocationMetadata = f3elemf0
+			}
 			if f3iter.AllocationType != "" {
 				f3elem.AllocationType = aws.String(string(f3iter.AllocationType))
 			}

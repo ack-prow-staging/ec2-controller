@@ -332,6 +332,18 @@ spec:
                 description: The ID of the Amazon Web Services account that owns the
                   endpoint.
                 type: string
+              payerResponsibilities:
+                description: The payer responsibility settings for the endpoint.
+                items:
+                  description: Describes a payer responsibility setting for a VPC
+                    endpoint.
+                  properties:
+                    payerResponsibilityType:
+                      type: string
+                    scope:
+                      type: string
+                  type: object
+                type: array
               requesterManaged:
                 description: Indicates whether the endpoint is being managed by its
                   service.

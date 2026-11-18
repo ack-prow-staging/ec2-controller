@@ -98,6 +98,13 @@ func newResourceDelta(
 					delta.Add("Spec.Data.CPUOptions.CoreCount", a.ko.Spec.Data.CPUOptions.CoreCount, b.ko.Spec.Data.CPUOptions.CoreCount)
 				}
 			}
+			if ackcompare.HasNilDifference(a.ko.Spec.Data.CPUOptions.NestedVirtualization, b.ko.Spec.Data.CPUOptions.NestedVirtualization) {
+				delta.Add("Spec.Data.CPUOptions.NestedVirtualization", a.ko.Spec.Data.CPUOptions.NestedVirtualization, b.ko.Spec.Data.CPUOptions.NestedVirtualization)
+			} else if a.ko.Spec.Data.CPUOptions.NestedVirtualization != nil && b.ko.Spec.Data.CPUOptions.NestedVirtualization != nil {
+				if *a.ko.Spec.Data.CPUOptions.NestedVirtualization != *b.ko.Spec.Data.CPUOptions.NestedVirtualization {
+					delta.Add("Spec.Data.CPUOptions.NestedVirtualization", a.ko.Spec.Data.CPUOptions.NestedVirtualization, b.ko.Spec.Data.CPUOptions.NestedVirtualization)
+				}
+			}
 			if ackcompare.HasNilDifference(a.ko.Spec.Data.CPUOptions.ThreadsPerCore, b.ko.Spec.Data.CPUOptions.ThreadsPerCore) {
 				delta.Add("Spec.Data.CPUOptions.ThreadsPerCore", a.ko.Spec.Data.CPUOptions.ThreadsPerCore, b.ko.Spec.Data.CPUOptions.ThreadsPerCore)
 			} else if a.ko.Spec.Data.CPUOptions.ThreadsPerCore != nil && b.ko.Spec.Data.CPUOptions.ThreadsPerCore != nil {
@@ -735,6 +742,13 @@ func newResourceDelta(
 		} else if a.ko.Spec.Data.RAMDiskID != nil && b.ko.Spec.Data.RAMDiskID != nil {
 			if *a.ko.Spec.Data.RAMDiskID != *b.ko.Spec.Data.RAMDiskID {
 				delta.Add("Spec.Data.RAMDiskID", a.ko.Spec.Data.RAMDiskID, b.ko.Spec.Data.RAMDiskID)
+			}
+		}
+		if len(a.ko.Spec.Data.SecondaryInterfaces) != len(b.ko.Spec.Data.SecondaryInterfaces) {
+			delta.Add("Spec.Data.SecondaryInterfaces", a.ko.Spec.Data.SecondaryInterfaces, b.ko.Spec.Data.SecondaryInterfaces)
+		} else if len(a.ko.Spec.Data.SecondaryInterfaces) > 0 {
+			if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.Data.SecondaryInterfaces, b.ko.Spec.Data.SecondaryInterfaces) {
+				delta.Add("Spec.Data.SecondaryInterfaces", a.ko.Spec.Data.SecondaryInterfaces, b.ko.Spec.Data.SecondaryInterfaces)
 			}
 		}
 		if len(a.ko.Spec.Data.SecurityGroupIDs) != len(b.ko.Spec.Data.SecurityGroupIDs) {

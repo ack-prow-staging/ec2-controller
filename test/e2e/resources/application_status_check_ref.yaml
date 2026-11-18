@@ -1,0 +1,22 @@
+apiVersion: ec2.services.k8s.aws/v1alpha1
+kind: ApplicationStatusCheck
+metadata:
+  name: $ASC_NAME
+spec:
+  protocol: http
+  port: 80
+  healthCheckPaths:
+    - source:
+        subnetRef:
+          from:
+            name: $SUBNET_NAME
+        securityGroupRef:
+          from:
+            name: $SECURITY_GROUP_NAME
+      destinations:
+        - subnetRef:
+            from:
+              name: $SUBNET_NAME
+          securityGroupRef:
+            from:
+              name: $SECURITY_GROUP_NAME
